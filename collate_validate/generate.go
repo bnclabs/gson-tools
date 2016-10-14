@@ -12,14 +12,6 @@ import "github.com/prataprc/goparsec"
 import "github.com/prataprc/monster"
 import mcommon "github.com/prataprc/monster/common"
 
-func randInteger(mrand *rand.Rand) int {
-	x := mrand.Int() % 1000000000
-	if (x % 3) == 0 {
-		return -x
-	}
-	return x
-}
-
 func generateInteger(seed, count int, ch chan string) {
 	mrand := rand.New(rand.NewSource(int64(seed)))
 	for i := 0; i < count; i++ {
@@ -89,6 +81,16 @@ func generateJSON(prodfile string, seed, count int, ch chan string) {
 	}
 }
 
+//---- local functions
+
+func randInteger(mrand *rand.Rand) int {
+	x := mrand.Int() % 1000000000
+	if (x % 3) == 0 {
+		return -x
+	}
+	return x
+}
+
 func compile(s parsec.Scanner) parsec.ParsecNode {
 	defer func() {
 		if r := recover(); r != nil {
@@ -99,11 +101,11 @@ func compile(s parsec.Scanner) parsec.ParsecNode {
 	return root
 }
 
-func evaluate(name string, scope mcommon.Scope, forms []*mcommon.Form) interface{} {
+func evaluate(nm string, scope mcommon.Scope, forms []*mcommon.Form) interface{} {
 	defer func() {
 		if r := recover(); r != nil {
 			log.Printf("%v", r)
 		}
 	}()
-	return monster.EvalForms(name, scope, forms)
+	return monster.EvalForms(nm, scope, forms)
 }

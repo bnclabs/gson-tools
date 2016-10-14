@@ -72,7 +72,7 @@ func collateValidate(seed int) {
 	var wg sync.WaitGroup
 	wg.Add(5)
 
-	go func() { // JsonToValueToCborToCollate
+	go func() {
 		mrand := rand.New(rand.NewSource(int64(seed)))
 		config := makeConfig(mrand)
 		ch := make(chan string, 1000)
