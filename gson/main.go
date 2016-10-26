@@ -632,31 +632,28 @@ func readinput() []byte {
 func makeConfig() *gson.Config {
 	config := gson.NewDefaultConfig()
 	switch options.nk {
-	case "snum":
+	case "smart":
 		config = config.SetNumberKind(gson.SmartNumber)
-	case "snum32":
-		config = config.SetNumberKind(gson.SmartNumber32)
-	case "int":
-		config = config.SetNumberKind(gson.IntNumber)
-	case "f64":
+	case "float":
 		config = config.SetNumberKind(gson.FloatNumber)
-	case "f32":
-		config = config.SetNumberKind(gson.FloatNumber32)
-	case "dec":
-		config = config.SetNumberKind(gson.Decimal)
+	default:
+		log.Fatalf("unknown number kind %v\n", options.nk)
 	}
+
 	switch options.ws {
 	case "ansi":
 		config = config.SetSpaceKind(gson.AnsiSpace)
 	case "unicode":
 		config = config.SetSpaceKind(gson.UnicodeSpace)
 	}
+
 	switch options.ct {
 	case "lenprefix":
 		config = config.SetContainerEncoding(gson.LengthPrefix)
 	case "stream":
 		config = config.SetContainerEncoding(gson.Stream)
 	}
+
 	config.SortbyArrayLen(options.arrayLenPrefix)
 	config.SortbyPropertyLen(options.propertyLenPrefix)
 	config.UseMissing(options.doMissing)
