@@ -74,10 +74,7 @@ var statistics = map[string]interface{}{
 	"string":            0,
 	"array":             0,
 	"object":            0,
-	"SmartNumber32":     0,
 	"SmartNumber":       0,
-	"IntNumber":         0,
-	"FloatNumber32":     0,
 	"FloatNumber":       0,
 	"Decimal":           0,
 	"AnsiSpace":         0,
@@ -751,34 +748,17 @@ func cloneCbor(config *gson.Config, doc interface{}) (*gson.Cbor, error) {
 
 func makeConfig(mrand *rand.Rand) *gson.Config {
 	config := gson.NewDefaultConfig()
-	nks := []string{"snum", "snum32", "int", "f64", "f32", "dec"}
+	nks := []string{"smart", "float"}
 	nk := nks[mrand.Intn(len(nks))]
 	switch nk {
-	case "snum":
-		// TODO: we are not going to test for smartnumbers.
-		// config = config.SetNumberKind(gson.SmartNumber)
-		config = config.SetNumberKind(gson.FloatNumber)
-		incrparam("FloatNumber", 1)
-	case "snum32":
-		// TODO: we are not going to test for smartnumbers32.
-		// config = config.SetNumberKind(gson.SmartNumber32)
-		config = config.SetNumberKind(gson.FloatNumber)
-		incrparam("FloatNumber", 1)
-	case "int":
-		config = config.SetNumberKind(gson.IntNumber)
-		incrparam("IntNumber", 1)
-	case "f64":
-		config = config.SetNumberKind(gson.FloatNumber)
-		incrparam("FloatNumber", 1)
-	case "f32":
-		config = config.SetNumberKind(gson.FloatNumber32)
-		incrparam("FloatNumber32", 1)
-	case "dec":
-		// TODO: we are not going to test for decimal numbers.
-		// config = config.SetNumberKind(gson.Decimal)
+	case "smart":
+		config = config.SetNumberKind(gson.SmartNumber)
+		incrparam("SmartNumber", 1)
+	case "float":
 		config = config.SetNumberKind(gson.FloatNumber)
 		incrparam("FloatNumber", 1)
 	}
+
 	wss := []string{"ansi", "unicode"}
 	ws := wss[mrand.Intn(len(wss))]
 	switch ws {
@@ -789,6 +769,7 @@ func makeConfig(mrand *rand.Rand) *gson.Config {
 		config = config.SetSpaceKind(gson.UnicodeSpace)
 		incrparam("UnicodeSpace", 1)
 	}
+
 	cts := []string{"lenprefix", "stream"}
 	ct := cts[mrand.Intn(len(cts))]
 	switch ct {
@@ -879,7 +860,7 @@ func printStatistics() {
 	}
 	write(strings.Join(properties, ", ") + "\n")
 
-	keys = []string{"IntNumber", "FloatNumber32", "FloatNumber", "Decimal"}
+	keys = []string{"FloatNumber", "SmartNumber"}
 	properties = []string{}
 	for _, key := range keys {
 		value := statistics[key]
