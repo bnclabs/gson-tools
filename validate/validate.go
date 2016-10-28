@@ -264,10 +264,8 @@ func value2json2cbor2collate(config *gson.Config, data []byte) (err error) {
 
 	value := rval.Tojson(jsn).Tocbor(cbr).Tocollate(clt).Tovalue()
 	ref, value = gson.Fixtojson(config, ref), gson.Fixtojson(config, value)
-	if !reflect.DeepEqual(ref, value) {
-		x, y := ref.([]interface{}), value.([]interface{})
-		//return fmt.Errorf("DeepEqual() expected %T, got %T", ref, value)
-		return fmt.Errorf("DeepEqual() expected %T, got %T", x[3], y[3])
+	if err := verifyobj(config, ref, value); err != nil {
+		return err
 	}
 	verbosef("value2json2cbor2collate ... ok\n")
 	return
@@ -289,8 +287,8 @@ func value2cbor2collate(config *gson.Config, data []byte) (err error) {
 
 	value := rval.Tocbor(cbr).Tocollate(clt).Tovalue()
 	ref, value = gson.Fixtojson(config, ref), gson.Fixtojson(config, value)
-	if !reflect.DeepEqual(ref, value) {
-		return fmt.Errorf("DeepEqual() expected %v, got %v", ref, value)
+	if err := verifyobj(config, ref, value); err != nil {
+		return err
 	}
 	verbosef("value2cbor2collate ... ok\n")
 	return
@@ -311,8 +309,8 @@ func value2collate(config *gson.Config, data []byte) (err error) {
 
 	value := rval.Tocollate(clt).Tovalue()
 	ref, value = gson.Fixtojson(config, ref), gson.Fixtojson(config, value)
-	if !reflect.DeepEqual(ref, value) {
-		return fmt.Errorf("DeepEqual() expected %v, got %v", ref, value)
+	if err := verifyobj(config, ref, value); err != nil {
+		return err
 	}
 	verbosef("value2collate ... ok\n")
 	return
@@ -337,8 +335,8 @@ func json2cbor2collate2value(config *gson.Config, data []byte) (err error) {
 	_, value := jsn.Tovalue()
 	// verify
 	ref, value = gson.Fixtojson(config, ref), gson.Fixtojson(config, value)
-	if !reflect.DeepEqual(ref, value) {
-		return fmt.Errorf("DeepEqual() expected %v, got %v", ref, value)
+	if err := verifyobj(config, ref, value); err != nil {
+		return err
 	}
 	verbosef("json2cbor2collate2value ... ok\n")
 	return
@@ -360,8 +358,8 @@ func json2collate2value(config *gson.Config, data []byte) (err error) {
 	val := config.NewValue(config.NewJson(data, -1).Tocollate(clt).Tovalue())
 	_, value := val.Tojson(jsn).Tovalue()
 	ref, value = gson.Fixtojson(config, ref), gson.Fixtojson(config, value)
-	if !reflect.DeepEqual(ref, value) {
-		return fmt.Errorf("DeepEqual() expected %v, got %v", ref, value)
+	if err := verifyobj(config, ref, value); err != nil {
+		return err
 	}
 	verbosef("json2collate2value ... ok\n")
 	return
@@ -380,8 +378,8 @@ func json2value(config *gson.Config, data []byte) (err error) {
 	rval := config.NewValue(ref)
 	_, value := rval.Tojson(config.NewJson(make([]byte, 1024), 0)).Tovalue()
 	ref, value = gson.Fixtojson(config, ref), gson.Fixtojson(config, value)
-	if !reflect.DeepEqual(ref, value) {
-		return fmt.Errorf("DeepEqual() expected %v, got %v", ref, value)
+	if err := verifyobj(config, ref, value); err != nil {
+		return err
 	}
 	verbosef("json2value ... ok\n")
 	return
@@ -405,8 +403,8 @@ func cbor2collate2value2json(config *gson.Config, data []byte) (err error) {
 	value := config.NewJson(data, -1).Tocbor(cbr).Tocollate(clt).Tovalue()
 	value = config.NewValue(value).Tojson(jsn).Tocbor(cbrback).Tovalue()
 	ref, value = gson.Fixtojson(config, ref), gson.Fixtojson(config, value)
-	if !reflect.DeepEqual(ref, value) {
-		return fmt.Errorf("DeepEqual() expected %v, got %v", ref, value)
+	if err := verifyobj(config, ref, value); err != nil {
+		return err
 	}
 	verbosef("cbor2collate2value2json ... ok\n")
 	return
@@ -428,8 +426,8 @@ func cbor2value2json(config *gson.Config, data []byte) (err error) {
 	val := config.NewValue(config.NewJson(data, -1).Tocbor(cbr).Tovalue())
 	value := val.Tojson(jsn).Tocbor(cbrback).Tovalue()
 	ref, value = gson.Fixtojson(config, ref), gson.Fixtojson(config, value)
-	if !reflect.DeepEqual(ref, value) {
-		return fmt.Errorf("DeepEqual() expected %v, got %v", ref, value)
+	if err := verifyobj(config, ref, value); err != nil {
+		return err
 	}
 	verbosef("cbor2value2json ... ok\n")
 	return
@@ -452,8 +450,8 @@ func cbor2json(config *gson.Config, data []byte) (err error) {
 	config.NewJson(data, -1).Tocbor(cbr).Tojson(jsn).Tocbor(cbrback)
 	value := cbrback.Tovalue()
 	ref, value = gson.Fixtojson(config, ref), gson.Fixtojson(config, value)
-	if !reflect.DeepEqual(ref, value) {
-		return fmt.Errorf("DeepEqual() expected %v, got %v", ref, value)
+	if err := verifyobj(config, ref, value); err != nil {
+		return err
 	}
 	verbosef("cbor2json ... ok\n")
 	return
@@ -477,8 +475,8 @@ func collate2value2json2cbor(config *gson.Config, data []byte) (err error) {
 	val := config.NewValue(config.NewJson(data, -1).Tocollate(clt).Tovalue())
 	value := val.Tojson(jsn).Tocbor(cbr).Tocollate(cltback).Tovalue()
 	ref, value = gson.Fixtojson(config, ref), gson.Fixtojson(config, value)
-	if !reflect.DeepEqual(ref, value) {
-		return fmt.Errorf("DeepEqual() expected %v, got %v", ref, value)
+	if err := verifyobj(config, ref, value); err != nil {
+		return err
 	}
 	verbosef("collate2value2json2cbor ... ok\n")
 	return
@@ -502,8 +500,8 @@ func collate2json2cbor(config *gson.Config, data []byte) (err error) {
 	config.NewJson(data, -1).Tocollate(clt).Tojson(jsn).Tocbor(cbr)
 	value := cbr.Tocollate(cltback).Tovalue()
 	ref, value = gson.Fixtojson(config, ref), gson.Fixtojson(config, value)
-	if !reflect.DeepEqual(ref, value) {
-		return fmt.Errorf("DeepEqual() expected %v, got %v", ref, value)
+	if err := verifyobj(config, ref, value); err != nil {
+		return err
 	}
 	verbosef("collate2json2cbor ... ok\n")
 	return
@@ -525,8 +523,8 @@ func collate2cbor(config *gson.Config, data []byte) (err error) {
 	config.NewJson(data, -1).Tocollate(clt).Tocbor(cbr).Tocollate(cltback)
 	value := cltback.Tovalue()
 	ref, value = gson.Fixtojson(config, ref), gson.Fixtojson(config, value)
-	if !reflect.DeepEqual(ref, value) {
-		return fmt.Errorf("DeepEqual() expected %v, got %v", ref, value)
+	if err := verifyobj(config, ref, value); err != nil {
+		return err
 	}
 	verbosef("collate2cbor ... ok\n")
 	return
@@ -564,9 +562,8 @@ func verifyCborPointers(config *gson.Config, docref interface{}) (err error) {
 	doc := cbrout.Tovalue()
 	doc, docref = gson.CborMap2golangMap(doc), gson.CborMap2golangMap(docref)
 	doc, docref = gson.Fixtojson(config, doc), gson.Fixtojson(config, docref)
-	if !reflect.DeepEqual(doc, docref) {
-		write("cbor-gsp expected %v, got %v\n", docref, doc)
-		return fmt.Errorf("error verifyCborPointers")
+	if err := verifyobj(config, docref, doc); err != nil {
+		return err
 	}
 	verbosef("verifyCborPointers ... ok\n")
 	return nil
@@ -826,7 +823,7 @@ func bookstats(config *gson.Config, js string, doc interface{}, err error) {
 		} else {
 			incrparam("false", 1)
 		}
-	case int64, float64, float32:
+	case uint64, int64, float64, float32:
 		incrparam("num", 1)
 	case string:
 		incrparam("string", 1)
@@ -942,6 +939,15 @@ func write(fmsg string, args ...interface{}) {
 	} else {
 		fmt.Printf(s)
 	}
+}
+
+func verifyobj(config *gson.Config, ref interface{}, value interface{}) error {
+	val := config.NewValue(value)
+	if config.NewValue(ref).Compare(val) != 0 {
+		fmsg := "verify(): expected %T(%v), got %T(%v)"
+		return fmt.Errorf(fmsg, ref, ref, value, value)
+	}
+	return nil
 }
 
 func verbosef(fmsg string, args ...interface{}) {
