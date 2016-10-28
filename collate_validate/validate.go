@@ -12,9 +12,7 @@ import "sort"
 import "time"
 import "path"
 import "runtime"
-import "reflect"
 
-import qv "github.com/couchbase/query/value"
 import "github.com/prataprc/gson"
 
 var options struct {
@@ -188,7 +186,7 @@ func validateWith(
 		collated = append(collated, fn([]byte(input)))
 	}
 
-	rawlist := &jsonList{vals: inputs, compares: 0}
+	rawlist := &jsonList{config: config, vals: inputs, compares: 0}
 	rawts := timeIt(func() { sort.Sort(rawlist) })
 	bints := timeIt(func() { sort.Sort(ByteSlices(collated)) })
 	fmt.Printf("config: %v\n", config.String())
@@ -218,8 +216,10 @@ func validateWith(
 		exit = true
 	}
 	for i, ref := range refs {
-		if !reflect.DeepEqual(ref, values[i]) {
-			fmt.Printf("index %v expected %v, got %v\n", i, ref, values[i])
+		val := config.NewValue(values[i])
+		refval := config.NewValue(ref)
+		if refval.Compare(val) != 0 {
+			fmt.Printf("index %v expected %T, got %T\n", i, ref, values[i])
 			exit = true
 		}
 	}
@@ -230,34 +230,17 @@ func validateWith(
 
 func makeConfig(mrand *rand.Rand) *gson.Config {
 	config := gson.NewDefaultConfig()
-	nks := []string{"f64"}
+	nks := []string{"float", "smart"}
 	nk := nks[mrand.Intn(len(nks))]
 	switch nk {
-	case "snum":
-		// TODO: we are not going to test for smartnumbers.
-		// config = config.SetNumberKind(gson.SmartNumber)
-		config = config.SetNumberKind(gson.FloatNumber)
-		//incrparam("FloatNumber", 1)
-	case "snum32":
-		// TODO: we are not going to test for smartnumbers32.
-		// config = config.SetNumberKind(gson.SmartNumber32)
-		config = config.SetNumberKind(gson.FloatNumber)
-		//incrparam("FloatNumber", 1)
-	case "int":
-		config = config.SetNumberKind(gson.IntNumber).SetStrict(false)
-		//incrparam("IntNumber", 1)
-	case "f64":
-		config = config.SetNumberKind(gson.FloatNumber)
-		//incrparam("FloatNumber", 1)
-	case "f32":
-		config = config.SetNumberKind(gson.FloatNumber32)
-		//incrparam("FloatNumber32", 1)
-	case "dec":
-		// TODO: we are not going to test for decimal numbers.
-		// config = config.SetNumberKind(gson.Decimal)
+	case "smart":
+		config = config.SetNumberKind(gson.SmartNumber)
+		//incrparam("SmartNumber", 1)
+	case "float":
 		config = config.SetNumberKind(gson.FloatNumber)
 		//incrparam("FloatNumber", 1)
 	}
+
 	wss := []string{"ansi", "unicode"}
 	ws := wss[mrand.Intn(len(wss))]
 	switch ws {
@@ -268,6 +251,7 @@ func makeConfig(mrand *rand.Rand) *gson.Config {
 		config = config.SetSpaceKind(gson.UnicodeSpace)
 		//incrparam("UnicodeSpace", 1)
 	}
+
 	cts := []string{"lenprefix", "stream"}
 	ct := cts[mrand.Intn(len(cts))]
 	switch ct {
@@ -319,6 +303,7 @@ func getStackTrace(skip int, stack []byte) string {
 // sort type for n1ql
 
 type jsonList struct {
+	config   *gson.Config
 	compares int
 	vals     []string
 }
@@ -330,9 +315,11 @@ func (jsons *jsonList) Len() int {
 func (jsons *jsonList) Less(i, j int) bool {
 	key1, key2 := jsons.vals[i], jsons.vals[j]
 	jsons.compares++
-	value1 := qv.NewValue([]byte(key1))
-	value2 := qv.NewValue([]byte(key2))
-	return value1.Collate(value2) < 0
+	_, v1 := jsons.config.NewJson([]byte(key1), -1).Tovalue()
+	value1 := jsons.config.NewValue(v1)
+	_, v2 := jsons.config.NewJson([]byte(key2), -1).Tovalue()
+	value2 := jsons.config.NewValue(v2)
+	return value1.Compare(value2) < 0
 }
 
 func (jsons *jsonList) Swap(i, j int) {
@@ -354,3 +341,9 @@ func (bs ByteSlices) Less(i, j int) bool {
 func (bs ByteSlices) Swap(i, j int) {
 	bs[i], bs[j] = bs[j], bs[i]
 }
+
+//func incrparam(param string, delta int) {
+//	statrw.Lock()
+//	defer statrw.Unlock()
+//	statistics[param] = statistics[param].(int) + delta
+//}
