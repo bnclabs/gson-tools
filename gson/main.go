@@ -95,15 +95,11 @@ func argParse() []string {
 	flag.BoolVar(&options.collate2json, "collate2json", false,
 		"convert inptxt or content in inpfile to json output")
 	// configuration switches
-	flag.StringVar(&options.nk, "nk", "flt32",
-		"interpret number as snum | snum32 | int | f32 | f64 | dec "+
-			"snum - either treat number as int64 or fall back to float64 "+
-			"snum - either treat number as int64 or fall back to float32 "+
-			"int - treat number as int64 "+
-			"f64 - treat number as float64 "+
-			"f32 - number as float32 "+
-			"dec - number as decimal ")
-	flag.StringVar(&options.nk, "ws", "ansi",
+	flag.StringVar(&options.nk, "nk", "float",
+		"interpret number as smart | float "+
+			"smart - either treat number as int64 or fall back to float64 "+
+			"float - treat number as float64 ")
+	flag.StringVar(&options.ws, "ws", "ansi",
 		"interpret space as ansi (ansi whitespace) | unicode (unicode space).")
 	flag.StringVar(&options.ct, "ct", "stream",
 		"container encoding for cbor stream | lenprefix.")
@@ -570,13 +566,15 @@ func computeOverheads() {
 		"10000",
 		"1000000000",
 		"100000000000000000.0",
-		"123456789123565670.0",
+		"123456789123565670",
 		"10.2",
 		"10.23456789012",
 		"null",
 		"true",
 		"false",
 		`"hello world"`,
+		`[]`,
+		`{}`,
 		`[10,10000,1000000000,10.2,10.23456789012,null,true,false,"hello world"]`,
 		`{"a":10000,"b":10.23456789012,"c":null,"d":true,"e":false,"f":"hello world"}`,
 	}
@@ -584,12 +582,18 @@ func computeOverheads() {
 	cbr := config.NewCbor(make([]byte, 1024), 0)
 	clt := config.NewCollate(make([]byte, 1024), 0)
 	for _, item := range items {
+		fmt.Printf("item: %v\n", item)
+
 		jsn := config.NewJson([]byte(item), -1)
 		jsn.Tocbor(cbr.Reset(nil))
 		jsn.Tocollate(clt.Reset(nil))
-		fmt.Printf("item: %v\n", item)
 		fmsg := "Json: %v bytes, Cbor: %v bytes, Collated: %v bytes\n"
 		fmt.Printf(fmsg, len(item), len(cbr.Bytes()), len(clt.Bytes()))
+
+		clt.Tojson(jsn.Reset(nil))
+		clt.Tocbor(cbr.Reset(nil))
+		fmsg = "Json: %v bytes, Cbor: %v bytes, Collated: %v bytes\n"
+		fmt.Printf(fmsg, len(jsn.Bytes()), len(cbr.Bytes()), len(clt.Bytes()))
 	}
 }
 
