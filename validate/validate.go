@@ -259,7 +259,7 @@ func value2json2cbor2collate(config *gson.Config, data []byte) (err error) {
 	_, ref := config.NewJson(data, -1).Tovalue()
 	rval := config.NewValue(ref)
 	jsn := config.NewJson(make([]byte, 1024), 0)
-	cbr := config.NewCbor(make([]byte, 1024), 0)
+	cbr := config.NewCbor(make([]byte, 0, 1024))
 	clt := config.NewCollate(make([]byte, 1024), 0)
 
 	value := rval.Tojson(jsn).Tocbor(cbr).Tocollate(clt).Tovalue()
@@ -282,7 +282,7 @@ func value2cbor2collate(config *gson.Config, data []byte) (err error) {
 	// json -> value -> cbor -> collate -> value
 	_, ref := config.NewJson(data, -1).Tovalue()
 	rval := config.NewValue(ref)
-	cbr := config.NewCbor(make([]byte, 1024), 0)
+	cbr := config.NewCbor(make([]byte, 0, 1024))
 	clt := config.NewCollate(make([]byte, 1024), 0)
 
 	value := rval.Tocbor(cbr).Tocollate(clt).Tovalue()
@@ -328,7 +328,7 @@ func json2cbor2collate2value(config *gson.Config, data []byte) (err error) {
 	_, ref := config.NewJson(data, -1).Tovalue()
 	rval := config.NewValue(ref)
 	jsn := config.NewJson(make([]byte, 1024), 0)
-	cbr := config.NewCbor(make([]byte, 1024), 0)
+	cbr := config.NewCbor(make([]byte, 0, 1024))
 	clt := config.NewCollate(make([]byte, 1024), 0)
 
 	config.NewValue(rval.Tocbor(cbr).Tocollate(clt).Tovalue()).Tojson(jsn)
@@ -396,9 +396,9 @@ func cbor2collate2value2json(config *gson.Config, data []byte) (err error) {
 	// json -> cbor -> collate -> value -> json -> cbor
 	_, ref := config.NewJson(data, -1).Tovalue()
 	jsn := config.NewJson(make([]byte, 1024), 0)
-	cbr := config.NewCbor(make([]byte, 1024), 0)
+	cbr := config.NewCbor(make([]byte, 0, 1024))
 	clt := config.NewCollate(make([]byte, 1024), 0)
-	cbrback := config.NewCbor(make([]byte, 1024), 0)
+	cbrback := config.NewCbor(make([]byte, 0, 1024))
 
 	value := config.NewJson(data, -1).Tocbor(cbr).Tocollate(clt).Tovalue()
 	value = config.NewValue(value).Tojson(jsn).Tocbor(cbrback).Tovalue()
@@ -421,8 +421,8 @@ func cbor2value2json(config *gson.Config, data []byte) (err error) {
 	// json -> cbor -> value -> json -> cbor -> value
 	_, ref := config.NewJson(data, -1).Tovalue()
 	jsn := config.NewJson(make([]byte, 1024), 0)
-	cbr := config.NewCbor(make([]byte, 1024), 0)
-	cbrback := config.NewCbor(make([]byte, 1024), 0)
+	cbr := config.NewCbor(make([]byte, 0, 1024))
+	cbrback := config.NewCbor(make([]byte, 0, 1024))
 	val := config.NewValue(config.NewJson(data, -1).Tocbor(cbr).Tovalue())
 	value := val.Tojson(jsn).Tocbor(cbrback).Tovalue()
 	ref, value = gson.Fixtojson(config, ref), gson.Fixtojson(config, value)
@@ -444,8 +444,8 @@ func cbor2json(config *gson.Config, data []byte) (err error) {
 	// json -> cbor -> json -> cbor -> value
 	_, ref := config.NewJson(data, -1).Tovalue()
 	jsn := config.NewJson(make([]byte, 1024), 0)
-	cbr := config.NewCbor(make([]byte, 1024), 0)
-	cbrback := config.NewCbor(make([]byte, 1024), 0)
+	cbr := config.NewCbor(make([]byte, 0, 1024))
+	cbrback := config.NewCbor(make([]byte, 0, 1024))
 
 	config.NewJson(data, -1).Tocbor(cbr).Tojson(jsn).Tocbor(cbrback)
 	value := cbrback.Tovalue()
@@ -469,7 +469,7 @@ func collate2value2json2cbor(config *gson.Config, data []byte) (err error) {
 	_, ref := config.NewJson(data, -1).Tovalue()
 	clt := config.NewCollate(make([]byte, 1024), 0)
 	jsn := config.NewJson(make([]byte, 1024), 0)
-	cbr := config.NewCbor(make([]byte, 1024), 0)
+	cbr := config.NewCbor(make([]byte, 0, 1024))
 	cltback := config.NewCollate(make([]byte, 1024), 0)
 
 	val := config.NewValue(config.NewJson(data, -1).Tocollate(clt).Tovalue())
@@ -494,7 +494,7 @@ func collate2json2cbor(config *gson.Config, data []byte) (err error) {
 	_, ref := config.NewJson(data, -1).Tovalue()
 	clt := config.NewCollate(make([]byte, 1024), 0)
 	jsn := config.NewJson(make([]byte, 1024), 0)
-	cbr := config.NewCbor(make([]byte, 1024), 0)
+	cbr := config.NewCbor(make([]byte, 0, 1024))
 	cltback := config.NewCollate(make([]byte, 1024), 0)
 
 	config.NewJson(data, -1).Tocollate(clt).Tojson(jsn).Tocbor(cbr)
@@ -518,7 +518,7 @@ func collate2cbor(config *gson.Config, data []byte) (err error) {
 	// json -> collate -> cbor -> collate -> value
 	_, ref := config.NewJson(data, -1).Tovalue()
 	clt := config.NewCollate(make([]byte, 1024), 0)
-	cbr := config.NewCbor(make([]byte, 1024), 0)
+	cbr := config.NewCbor(make([]byte, 0, 1024))
 	cltback := config.NewCollate(make([]byte, 1024), 0)
 	config.NewJson(data, -1).Tocollate(clt).Tocbor(cbr).Tocollate(cltback)
 	value := cltback.Tovalue()
@@ -661,7 +661,7 @@ func cloneValue(config *gson.Config, doc interface{}) interface{} {
 
 func cloneCbor(config *gson.Config, doc interface{}) (*gson.Cbor, error) {
 	val := config.NewValue(doc)
-	cbr := val.Tocbor(config.NewCbor(make([]byte, 10*1024*1024), 0))
+	cbr := val.Tocbor(config.NewCbor(make([]byte, 0, 10*1024*1024)))
 
 	pointers := val.ListPointers([]string{})
 	ptrs := make(jptrs, 0)
@@ -679,8 +679,8 @@ func cloneCbor(config *gson.Config, doc interface{}) (*gson.Cbor, error) {
 	}
 
 	// populate root container.
-	out1 := config.NewCbor(make([]byte, 10*10*1024), 0)
-	out2 := config.NewCbor(make([]byte, 10*10*1024), 0)
+	out1 := config.NewCbor(make([]byte, 0, 10*10*1024))
+	out2 := config.NewCbor(make([]byte, 0, 10*10*1024))
 	switch v := doc.(type) {
 	case []interface{}:
 		config.NewValue(initArray(len(v))).Tocbor(out1)
@@ -692,8 +692,8 @@ func cloneCbor(config *gson.Config, doc interface{}) (*gson.Cbor, error) {
 
 	debugf(fmt.Sprintln("@initial", out1.Bytes()))
 
-	itemcbr := config.NewCbor(make([]byte, 10*1024*1024), 0)
-	oitemcbr := config.NewCbor(make([]byte, 10*1024*1024), 0)
+	itemcbr := config.NewCbor(make([]byte, 0, 10*1024*1024))
+	oitemcbr := config.NewCbor(make([]byte, 0, 10*1024*1024))
 
 	// populate containers.
 	for _, ptr := range ptrs {

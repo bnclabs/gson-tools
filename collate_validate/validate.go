@@ -81,7 +81,7 @@ func collateValidate(seed int) {
 			options.count,
 			ch,
 			func(input []byte) []byte {
-				cbr := config.NewCbor(make([]byte, 1024), 0)
+				cbr := config.NewCbor(make([]byte, 0, 1024))
 				clt := config.NewCollate(make([]byte, 1024), 0)
 				_, value := config.NewJson(input, -1).Tovalue()
 				return config.NewValue(value).Tocbor(cbr).Tocollate(clt).Bytes()
@@ -135,7 +135,7 @@ func collateValidate(seed int) {
 			options.count,
 			ch,
 			func(input []byte) []byte {
-				cbr := config.NewCbor(make([]byte, 1024), 0)
+				cbr := config.NewCbor(make([]byte, 0, 1024))
 				clt := config.NewCollate(make([]byte, 1024), 0)
 				value := config.NewJson(input, -1).Tocbor(cbr).Tovalue()
 				return config.NewValue(value).Tocollate(clt).Bytes()
@@ -154,7 +154,7 @@ func collateValidate(seed int) {
 			options.count,
 			ch,
 			func(input []byte) []byte {
-				cbr := config.NewCbor(make([]byte, 1024), 0)
+				cbr := config.NewCbor(make([]byte, 0, 1024))
 				clt := config.NewCollate(make([]byte, 1024), 0)
 				config.NewJson(input, -1).Tocbor(cbr)
 				return cbr.Tocollate(clt).Bytes()
