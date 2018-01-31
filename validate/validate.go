@@ -155,7 +155,7 @@ func validateRandom() (status map[string]interface{}) {
 func validateString(mrand *rand.Rand, jsonstr string) (err error) {
 	config := makeConfig(mrand)
 	data := str2bytes(jsonstr)
-	jsn := config.NewJson(str2bytes(jsonstr), -1)
+	jsn := config.NewJson(str2bytes(jsonstr))
 
 	_, doc := jsn.Tovalue()
 
@@ -256,9 +256,9 @@ func value2json2cbor2collate(config *gson.Config, data []byte) (err error) {
 		}
 	}()
 	// value -> json -> cbor -> collate -> value
-	_, ref := config.NewJson(data, -1).Tovalue()
+	_, ref := config.NewJson(data).Tovalue()
 	rval := config.NewValue(ref)
-	jsn := config.NewJson(make([]byte, 1024), 0)
+	jsn := config.NewJson(make([]byte, 0, 1024))
 	cbr := config.NewCbor(make([]byte, 0, 1024))
 	clt := config.NewCollate(make([]byte, 1024), 0)
 
@@ -280,7 +280,7 @@ func value2cbor2collate(config *gson.Config, data []byte) (err error) {
 		}
 	}()
 	// json -> value -> cbor -> collate -> value
-	_, ref := config.NewJson(data, -1).Tovalue()
+	_, ref := config.NewJson(data).Tovalue()
 	rval := config.NewValue(ref)
 	cbr := config.NewCbor(make([]byte, 0, 1024))
 	clt := config.NewCollate(make([]byte, 1024), 0)
@@ -303,7 +303,7 @@ func value2collate(config *gson.Config, data []byte) (err error) {
 		}
 	}()
 	// json -> value -> collate -> value
-	_, ref := config.NewJson(data, -1).Tovalue()
+	_, ref := config.NewJson(data).Tovalue()
 	rval := config.NewValue(ref)
 	clt := config.NewCollate(make([]byte, 1024), 0)
 
@@ -325,9 +325,9 @@ func json2cbor2collate2value(config *gson.Config, data []byte) (err error) {
 		}
 	}()
 	// json -> value -> cbor -> collate -> value -> json -> value
-	_, ref := config.NewJson(data, -1).Tovalue()
+	_, ref := config.NewJson(data).Tovalue()
 	rval := config.NewValue(ref)
-	jsn := config.NewJson(make([]byte, 1024), 0)
+	jsn := config.NewJson(make([]byte, 0, 1024))
 	cbr := config.NewCbor(make([]byte, 0, 1024))
 	clt := config.NewCollate(make([]byte, 1024), 0)
 
@@ -351,11 +351,11 @@ func json2collate2value(config *gson.Config, data []byte) (err error) {
 		}
 	}()
 	// json -> collate -> value -> json -> value
-	_, ref := config.NewJson(data, -1).Tovalue()
-	jsn := config.NewJson(make([]byte, 1024), 0)
+	_, ref := config.NewJson(data).Tovalue()
+	jsn := config.NewJson(nil)
 	clt := config.NewCollate(make([]byte, 1024), 0)
 
-	val := config.NewValue(config.NewJson(data, -1).Tocollate(clt).Tovalue())
+	val := config.NewValue(config.NewJson(data).Tocollate(clt).Tovalue())
 	_, value := val.Tojson(jsn).Tovalue()
 	ref, value = gson.Fixtojson(config, ref), gson.Fixtojson(config, value)
 	if err := verifyobj(config, ref, value); err != nil {
@@ -374,9 +374,9 @@ func json2value(config *gson.Config, data []byte) (err error) {
 		}
 	}()
 	// json -> value -> json -> value
-	_, ref := config.NewJson(data, -1).Tovalue()
+	_, ref := config.NewJson(data).Tovalue()
 	rval := config.NewValue(ref)
-	_, value := rval.Tojson(config.NewJson(make([]byte, 1024), 0)).Tovalue()
+	_, value := rval.Tojson(config.NewJson(make([]byte, 0, 1024))).Tovalue()
 	ref, value = gson.Fixtojson(config, ref), gson.Fixtojson(config, value)
 	if err := verifyobj(config, ref, value); err != nil {
 		return err
@@ -394,13 +394,13 @@ func cbor2collate2value2json(config *gson.Config, data []byte) (err error) {
 		}
 	}()
 	// json -> cbor -> collate -> value -> json -> cbor
-	_, ref := config.NewJson(data, -1).Tovalue()
-	jsn := config.NewJson(make([]byte, 1024), 0)
+	_, ref := config.NewJson(data).Tovalue()
+	jsn := config.NewJson(make([]byte, 0, 1024))
 	cbr := config.NewCbor(make([]byte, 0, 1024))
 	clt := config.NewCollate(make([]byte, 1024), 0)
 	cbrback := config.NewCbor(make([]byte, 0, 1024))
 
-	value := config.NewJson(data, -1).Tocbor(cbr).Tocollate(clt).Tovalue()
+	value := config.NewJson(data).Tocbor(cbr).Tocollate(clt).Tovalue()
 	value = config.NewValue(value).Tojson(jsn).Tocbor(cbrback).Tovalue()
 	ref, value = gson.Fixtojson(config, ref), gson.Fixtojson(config, value)
 	if err := verifyobj(config, ref, value); err != nil {
@@ -419,11 +419,11 @@ func cbor2value2json(config *gson.Config, data []byte) (err error) {
 		}
 	}()
 	// json -> cbor -> value -> json -> cbor -> value
-	_, ref := config.NewJson(data, -1).Tovalue()
-	jsn := config.NewJson(make([]byte, 1024), 0)
+	_, ref := config.NewJson(data).Tovalue()
+	jsn := config.NewJson(make([]byte, 0, 1024))
 	cbr := config.NewCbor(make([]byte, 0, 1024))
 	cbrback := config.NewCbor(make([]byte, 0, 1024))
-	val := config.NewValue(config.NewJson(data, -1).Tocbor(cbr).Tovalue())
+	val := config.NewValue(config.NewJson(data).Tocbor(cbr).Tovalue())
 	value := val.Tojson(jsn).Tocbor(cbrback).Tovalue()
 	ref, value = gson.Fixtojson(config, ref), gson.Fixtojson(config, value)
 	if err := verifyobj(config, ref, value); err != nil {
@@ -442,12 +442,12 @@ func cbor2json(config *gson.Config, data []byte) (err error) {
 		}
 	}()
 	// json -> cbor -> json -> cbor -> value
-	_, ref := config.NewJson(data, -1).Tovalue()
-	jsn := config.NewJson(make([]byte, 1024), 0)
+	_, ref := config.NewJson(data).Tovalue()
+	jsn := config.NewJson(make([]byte, 0, 1024))
 	cbr := config.NewCbor(make([]byte, 0, 1024))
 	cbrback := config.NewCbor(make([]byte, 0, 1024))
 
-	config.NewJson(data, -1).Tocbor(cbr).Tojson(jsn).Tocbor(cbrback)
+	config.NewJson(data).Tocbor(cbr).Tojson(jsn).Tocbor(cbrback)
 	value := cbrback.Tovalue()
 	ref, value = gson.Fixtojson(config, ref), gson.Fixtojson(config, value)
 	if err := verifyobj(config, ref, value); err != nil {
@@ -466,13 +466,13 @@ func collate2value2json2cbor(config *gson.Config, data []byte) (err error) {
 		}
 	}()
 	// json -> collate -> value -> json -> cbor -> collate -> value
-	_, ref := config.NewJson(data, -1).Tovalue()
+	_, ref := config.NewJson(data).Tovalue()
 	clt := config.NewCollate(make([]byte, 1024), 0)
-	jsn := config.NewJson(make([]byte, 1024), 0)
+	jsn := config.NewJson(make([]byte, 0, 1024))
 	cbr := config.NewCbor(make([]byte, 0, 1024))
 	cltback := config.NewCollate(make([]byte, 1024), 0)
 
-	val := config.NewValue(config.NewJson(data, -1).Tocollate(clt).Tovalue())
+	val := config.NewValue(config.NewJson(data).Tocollate(clt).Tovalue())
 	value := val.Tojson(jsn).Tocbor(cbr).Tocollate(cltback).Tovalue()
 	ref, value = gson.Fixtojson(config, ref), gson.Fixtojson(config, value)
 	if err := verifyobj(config, ref, value); err != nil {
@@ -491,13 +491,13 @@ func collate2json2cbor(config *gson.Config, data []byte) (err error) {
 		}
 	}()
 	// json -> collate -> json -> cbor -> collate
-	_, ref := config.NewJson(data, -1).Tovalue()
+	_, ref := config.NewJson(data).Tovalue()
 	clt := config.NewCollate(make([]byte, 1024), 0)
-	jsn := config.NewJson(make([]byte, 1024), 0)
+	jsn := config.NewJson(make([]byte, 0, 1024))
 	cbr := config.NewCbor(make([]byte, 0, 1024))
 	cltback := config.NewCollate(make([]byte, 1024), 0)
 
-	config.NewJson(data, -1).Tocollate(clt).Tojson(jsn).Tocbor(cbr)
+	config.NewJson(data).Tocollate(clt).Tojson(jsn).Tocbor(cbr)
 	value := cbr.Tocollate(cltback).Tovalue()
 	ref, value = gson.Fixtojson(config, ref), gson.Fixtojson(config, value)
 	if err := verifyobj(config, ref, value); err != nil {
@@ -516,11 +516,11 @@ func collate2cbor(config *gson.Config, data []byte) (err error) {
 		}
 	}()
 	// json -> collate -> cbor -> collate -> value
-	_, ref := config.NewJson(data, -1).Tovalue()
+	_, ref := config.NewJson(data).Tovalue()
 	clt := config.NewCollate(make([]byte, 1024), 0)
 	cbr := config.NewCbor(make([]byte, 0, 1024))
 	cltback := config.NewCollate(make([]byte, 1024), 0)
-	config.NewJson(data, -1).Tocollate(clt).Tocbor(cbr).Tocollate(cltback)
+	config.NewJson(data).Tocollate(clt).Tocbor(cbr).Tocollate(cltback)
 	value := cltback.Tovalue()
 	ref, value = gson.Fixtojson(config, ref), gson.Fixtojson(config, value)
 	if err := verifyobj(config, ref, value); err != nil {

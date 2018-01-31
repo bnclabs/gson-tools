@@ -83,7 +83,7 @@ func collateValidate(seed int) {
 			func(input []byte) []byte {
 				cbr := config.NewCbor(make([]byte, 0, 1024))
 				clt := config.NewCollate(make([]byte, 1024), 0)
-				_, value := config.NewJson(input, -1).Tovalue()
+				_, value := config.NewJson(input).Tovalue()
 				return config.NewValue(value).Tocbor(cbr).Tocollate(clt).Bytes()
 			})
 		wg.Done()
@@ -101,7 +101,7 @@ func collateValidate(seed int) {
 			ch,
 			func(input []byte) []byte {
 				clt := config.NewCollate(make([]byte, 1024), 0)
-				_, value := config.NewJson(input, -1).Tovalue()
+				_, value := config.NewJson(input).Tovalue()
 				return config.NewValue(value).Tocollate(clt).Bytes()
 			})
 		wg.Done()
@@ -119,7 +119,7 @@ func collateValidate(seed int) {
 			ch,
 			func(input []byte) []byte {
 				clt := config.NewCollate(make([]byte, 1024), 0)
-				return config.NewJson(input, -1).Tocollate(clt).Bytes()
+				return config.NewJson(input).Tocollate(clt).Bytes()
 			})
 		wg.Done()
 	}()
@@ -137,7 +137,7 @@ func collateValidate(seed int) {
 			func(input []byte) []byte {
 				cbr := config.NewCbor(make([]byte, 0, 1024))
 				clt := config.NewCollate(make([]byte, 1024), 0)
-				value := config.NewJson(input, -1).Tocbor(cbr).Tovalue()
+				value := config.NewJson(input).Tocbor(cbr).Tovalue()
 				return config.NewValue(value).Tocollate(clt).Bytes()
 			})
 		wg.Done()
@@ -156,7 +156,7 @@ func collateValidate(seed int) {
 			func(input []byte) []byte {
 				cbr := config.NewCbor(make([]byte, 0, 1024))
 				clt := config.NewCollate(make([]byte, 1024), 0)
-				config.NewJson(input, -1).Tocbor(cbr)
+				config.NewJson(input).Tocbor(cbr)
 				return cbr.Tocollate(clt).Bytes()
 			})
 		wg.Done()
@@ -195,7 +195,7 @@ func validateWith(
 
 	// validate sort order
 	refs := make([]interface{}, 0, count)
-	jsn := config.NewJson(make([]byte, 1024), 0)
+	jsn := config.NewJson(make([]byte, 0, 1024))
 	for _, input = range rawlist.vals {
 		_, ref := jsn.Reset([]byte(input)).Tovalue()
 		refs = append(refs, gson.Fixtojson(config, ref))
@@ -203,7 +203,7 @@ func validateWith(
 
 	values := make([]interface{}, 0, count)
 	clt := config.NewCollate(make([]byte, 1024), 0)
-	jsn = config.NewJson(make([]byte, 1024), 0)
+	jsn = config.NewJson(make([]byte, 0, 1024))
 	for _, collin := range collated {
 		_, value := clt.Reset([]byte(collin)).Tojson(jsn.Reset(nil)).Tovalue()
 		values = append(values, gson.Fixtojson(config, value))
@@ -315,9 +315,9 @@ func (jsons *jsonList) Len() int {
 func (jsons *jsonList) Less(i, j int) bool {
 	key1, key2 := jsons.vals[i], jsons.vals[j]
 	jsons.compares++
-	_, v1 := jsons.config.NewJson([]byte(key1), -1).Tovalue()
+	_, v1 := jsons.config.NewJson([]byte(key1)).Tovalue()
 	value1 := jsons.config.NewValue(v1)
-	_, v2 := jsons.config.NewJson([]byte(key2), -1).Tovalue()
+	_, v2 := jsons.config.NewJson([]byte(key2)).Tovalue()
 	value2 := jsons.config.NewValue(v2)
 	return value1.Compare(value2) < 0
 }
