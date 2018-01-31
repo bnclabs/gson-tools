@@ -82,7 +82,7 @@ func collateValidate(seed int) {
 			ch,
 			func(input []byte) []byte {
 				cbr := config.NewCbor(make([]byte, 0, 1024))
-				clt := config.NewCollate(make([]byte, 1024), 0)
+				clt := config.NewCollate(make([]byte, 0, 1024))
 				_, value := config.NewJson(input).Tovalue()
 				return config.NewValue(value).Tocbor(cbr).Tocollate(clt).Bytes()
 			})
@@ -100,7 +100,7 @@ func collateValidate(seed int) {
 			options.count,
 			ch,
 			func(input []byte) []byte {
-				clt := config.NewCollate(make([]byte, 1024), 0)
+				clt := config.NewCollate(make([]byte, 0, 1024))
 				_, value := config.NewJson(input).Tovalue()
 				return config.NewValue(value).Tocollate(clt).Bytes()
 			})
@@ -118,7 +118,7 @@ func collateValidate(seed int) {
 			options.count,
 			ch,
 			func(input []byte) []byte {
-				clt := config.NewCollate(make([]byte, 1024), 0)
+				clt := config.NewCollate(make([]byte, 0, 1024))
 				return config.NewJson(input).Tocollate(clt).Bytes()
 			})
 		wg.Done()
@@ -136,7 +136,7 @@ func collateValidate(seed int) {
 			ch,
 			func(input []byte) []byte {
 				cbr := config.NewCbor(make([]byte, 0, 1024))
-				clt := config.NewCollate(make([]byte, 1024), 0)
+				clt := config.NewCollate(make([]byte, 0, 1024))
 				value := config.NewJson(input).Tocbor(cbr).Tovalue()
 				return config.NewValue(value).Tocollate(clt).Bytes()
 			})
@@ -155,7 +155,7 @@ func collateValidate(seed int) {
 			ch,
 			func(input []byte) []byte {
 				cbr := config.NewCbor(make([]byte, 0, 1024))
-				clt := config.NewCollate(make([]byte, 1024), 0)
+				clt := config.NewCollate(make([]byte, 0, 1024))
 				config.NewJson(input).Tocbor(cbr)
 				return cbr.Tocollate(clt).Bytes()
 			})
@@ -202,7 +202,7 @@ func validateWith(
 	}
 
 	values := make([]interface{}, 0, count)
-	clt := config.NewCollate(make([]byte, 1024), 0)
+	clt := config.NewCollate(make([]byte, 0, 1024))
 	jsn = config.NewJson(make([]byte, 0, 1024))
 	for _, collin := range collated {
 		_, value := clt.Reset([]byte(collin)).Tojson(jsn.Reset(nil)).Tovalue()
