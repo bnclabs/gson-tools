@@ -13,7 +13,7 @@ import "time"
 import "path"
 import "runtime"
 
-import "github.com/prataprc/gson"
+import "github.com/bnclabs/gson"
 
 var options struct {
 	repeat   int

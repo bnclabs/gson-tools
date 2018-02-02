@@ -2,7 +2,7 @@ package main
 
 import "bytes"
 
-import "github.com/prataprc/gson"
+import "github.com/bnclabs/gson"
 
 type sgmts []string
 

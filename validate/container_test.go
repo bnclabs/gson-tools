@@ -9,7 +9,7 @@ import "compress/gzip"
 import "strings"
 import "sort"
 
-import "github.com/prataprc/gson"
+import "github.com/bnclabs/gson"
 
 func TestSgmtsSort(t *testing.T) {
 	txt := string(testdataFile("../../testdata/typical_pointers"))

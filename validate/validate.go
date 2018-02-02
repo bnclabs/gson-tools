@@ -17,7 +17,7 @@ import "bytes"
 import "errors"
 import "sort"
 
-import "github.com/prataprc/gson"
+import "github.com/bnclabs/gson"
 import "github.com/prataprc/goparsec"
 import "github.com/prataprc/monster"
 import mcommon "github.com/prataprc/monster/common"
