@@ -352,7 +352,7 @@ func json2collate2value(config *gson.Config, data []byte) (err error) {
 	}()
 	// json -> collate -> value -> json -> value
 	_, ref := config.NewJson(data).Tovalue()
-	jsn := config.NewJson(nil)
+	jsn := config.NewJson(make([]byte, 0, 1024))
 	clt := config.NewCollate(make([]byte, 0, 1024))
 
 	val := config.NewValue(config.NewJson(data).Tocollate(clt).Tovalue())
