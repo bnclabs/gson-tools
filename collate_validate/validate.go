@@ -188,7 +188,7 @@ func validateWith(
 
 	rawlist := &jsonList{config: config, vals: inputs, compares: 0}
 	rawts := timeIt(func() { sort.Sort(rawlist) })
-	bints := timeIt(func() { sort.Sort(ByteSlices(collated)) })
+	bints := timeIt(func() { sort.Sort(byteSlices(collated)) })
 	fmt.Printf("config: %v\n", config.String())
 	fmsg := "%-30v: %v Vs %v %v compares\n"
 	fmt.Printf(fmsg, nm, rawts, bints, rawlist.compares)
@@ -328,17 +328,17 @@ func (jsons *jsonList) Swap(i, j int) {
 
 // sort type for slice of []byte
 
-type ByteSlices [][]byte
+type byteSlices [][]byte
 
-func (bs ByteSlices) Len() int {
+func (bs byteSlices) Len() int {
 	return len(bs)
 }
 
-func (bs ByteSlices) Less(i, j int) bool {
+func (bs byteSlices) Less(i, j int) bool {
 	return bytes.Compare(bs[i], bs[j]) < 0
 }
 
-func (bs ByteSlices) Swap(i, j int) {
+func (bs byteSlices) Swap(i, j int) {
 	bs[i], bs[j] = bs[j], bs[i]
 }
 
